@@ -1,4 +1,4 @@
-# Audio Transcriber v1.2.0
+# Audio Transcriber v1.2.1
 
 Offline multilingual audio transcription and optional translation pipeline.
 
