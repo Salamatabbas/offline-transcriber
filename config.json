@@ -1,0 +1,27 @@
+{
+  "source_language": "auto",
+  "target_language": "en",
+  "model": "medium",
+  "profile": "balanced",
+  "mode": "transcribe",
+  "outputs": [
+    "txt"
+  ],
+  "clean": true,
+  "archive": false,
+  "skip_existing": true,
+  "single_file": null,
+  "paragraph_mode": true,
+  "paragraph_pause_threshold": 2.5,
+  "paragraph_max_sentences": 5,
+  "dynamic_paragraph_threshold": true,
+  "vad_filter": true,
+  "condition_on_previous_text": false,
+  "chunking_enabled": true,
+  "chunk_minutes": 15,
+  "chunk_overlap_seconds": 10,
+  "chunk_threshold_minutes": 20,
+  "resume_chunks": true,
+  "preprocess_audio": false,
+  "cleanup_work_files": true
+}
