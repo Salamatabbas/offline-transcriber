@@ -1,28 +1,22 @@
-# Audio Transcriber v1.2.0
+# Audio Transcriber v1.2.1
 
 Offline multilingual audio transcription and optional translation pipeline.
 
-## Privacy & Data Handling
-
-All processing is performed fully offline on the user's local machine.
-
-This software does **not**:
-- upload audio files
-- transmit transcripts
-- send translations
-- share metadata
-- collect analytics
-- communicate with external servers during transcription or translation
-
-No user data is stored, shared, or transmitted beyond the user's own device.
-
-Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
 
 ## About This Project
 
-This project was developed using a **Vibe Coding** workflow with extensive human supervision, iterative refinement, and multi-phase testing.
 
-Every major component has been manually reviewed, repeatedly tested, and improved over multiple development phases.
+Offline Transcriber is an open-source tool for accurate offline transcription of audio recordings into text. It supports a wide range of common audio formats and can optionally translate transcripts into English. After the initial installation, all transcription runs fully offline without requiring an internet connection.
+
+The tool is especially useful for:
+
+* Students and academic researchers transcribing interviews
+* Journalists handling sensitive recordings
+* Professionals working with confidential audio data
+* Anyone who needs privacy-preserving offline speech-to-text transcription
+
+
+This project was developed using a **Vibe Coding** workflow with extensive human supervision, iterative refinement, and multi-phase testing. Every major component has been manually reviewed, repeatedly tested, and improved over multiple development phases.
 
 ## Features
 
@@ -37,6 +31,12 @@ Every major component has been manually reviewed, repeatedly tested, and improve
 - Detailed run logs with RTF metrics
 - Interactive installer with model selection
 - MIT License
+
+## Privacy & Data Handling
+
+All processing is performed fully offline on the user's local machine.
+No user data is stored, shared, or transmitted beyond the user's own device. Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
+
 
 ## Installation
 
@@ -54,6 +54,8 @@ install_transcriber.bat
 ```
 
 ## Usage Examples
+Before running the tool, place the audio files you want to transcribe into the **Input** folder located in the project directory. The transcriber will automatically process supported audio files found there.
+
 
 ### macOS
 ```bash
