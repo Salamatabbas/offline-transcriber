@@ -128,3 +128,26 @@ This release includes a compatibility workaround for common OpenMP runtime confl
 The run summary shows:
 - **Source setting** = what you asked the program to do (`auto` means automatic detection)
 - **Target language** = only shown when translation is enabled
+
+
+## Subtitle Export
+
+The tool can export subtitle files in `.srt` and `.vtt` formats.
+
+### Examples
+
+```bash
+./transcribe_mac.sh -single audio.mp3 -srt
+./transcribe_mac.sh -single audio.mp3 -translate -srt
+./transcribe_mac.sh -single audio.mp3 -vtt
+```
+
+```bat
+transcribe.bat -single audio.mp3 -srt
+transcribe.bat -single audio.mp3 -translate -srt
+transcribe.bat -single audio.mp3 -vtt
+```
+
+When `-translate` and `-srt` are used together, the tool generates both:
+- original-language transcript/subtitle
+- English translation transcript/subtitle

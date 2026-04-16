@@ -48,6 +48,8 @@ Usage:
   python transcribe.py
   python transcribe.py -single lecture1.m4a
   python transcribe.py -translate
+  python transcribe.py -srt
+  python transcribe.py -vtt
   python transcribe.py -large
   python transcribe.py -accurate
   python transcribe.py -preprocess

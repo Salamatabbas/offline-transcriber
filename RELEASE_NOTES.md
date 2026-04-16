@@ -1,10 +1,9 @@
-# Release Notes v1.2.1
+# Release Notes v1.2.2
 
-## Final polish
-- GitHub-ready release bundle
-- Windows OpenMP / Parallels compatibility workaround added
-- Clearer log wording:
-  - `Source setting` instead of `Source language`
-  - target language shown as `n/a` when translation is disabled
-- README updated with Windows / Parallels note
-- Validated transcription core included
+## Documentation / UX update
+- Clarified CLI help for `-srt` and `-vtt`
+- Added subtitle export section to README
+
+## Note
+SRT/VTT export was already supported by the validated transcription core.
+This release makes that capability visible and documented.
