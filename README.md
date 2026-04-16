@@ -35,9 +35,7 @@ This project was developed using a **Vibe Coding** workflow with extensive human
 ## Privacy & Data Handling
 
 All processing is performed fully offline on the user's local machine.
-No user data is stored, shared, or transmitted beyond the user's own device.
-
-Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
+No user data is stored, shared, or transmitted beyond the user's own device. Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
 
 
 ## Installation
