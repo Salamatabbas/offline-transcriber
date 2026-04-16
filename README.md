@@ -15,8 +15,6 @@ The tool is especially useful for:
 * Professionals working with confidential audio data
 * Anyone who needs privacy-preserving offline speech-to-text transcription
 
-Designed for ease of use, the project includes guided installers for Windows and macOS and requires no cloud services during operation.
-
 
 This project was developed using a **Vibe Coding** workflow with extensive human supervision, iterative refinement, and multi-phase testing. Every major component has been manually reviewed, repeatedly tested, and improved over multiple development phases.
 
