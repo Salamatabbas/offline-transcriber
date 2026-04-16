@@ -6,9 +6,7 @@ Offline multilingual audio transcription and optional translation pipeline.
 ## About This Project
 
 
-Offline Transcriber is an open-source tool for accurate offline transcription of audio recordings into text.
-
-It supports a wide range of common audio formats and can optionally translate transcripts into English. After the initial installation, all transcription runs fully offline without requiring an internet connection.
+Offline Transcriber is an open-source tool for accurate offline transcription of audio recordings into text. It supports a wide range of common audio formats and can optionally translate transcripts into English. After the initial installation, all transcription runs fully offline without requiring an internet connection.
 
 The tool is especially useful for:
 
