@@ -93,45 +93,6 @@ transcribe.bat -preprocess
 - `--init` create project folders and config
 - `-config` show current config
 
-## Accuracy Disclaimer
-
-Transcription and translation quality depend heavily on:
-- audio quality
-- speaker clarity
-- accent / dialect
-- background noise
-- speaking speed
-- recording compression
-- conversational vs. formal speech
-
-While this software has been extensively tested and refined, no automated transcription or translation system can guarantee perfect accuracy.
-
-Users are encouraged to review generated outputs before relying on them for important, professional, academic, legal, or medical purposes.
-
-## License
-
-MIT License
-
-## Author
-
-**Abbas SALAMAT**  
-Abbas.salamat@edu.donau-uni.ac.at
-
-Suggestions, improvements, bug reports, and contributions are welcome.
-
-
-## Notes for Windows / Parallels
-
-If you run the Windows version inside Parallels or another VM, performance may be slower than native macOS.
-This release includes a compatibility workaround for common OpenMP runtime conflicts on Windows.
-
-## Log Wording
-
-The run summary shows:
-- **Source setting** = what you asked the program to do (`auto` means automatic detection)
-- **Target language** = only shown when translation is enabled
-
-
 ## Subtitle Export
 
 The tool can export subtitle files in `.srt` and `.vtt` formats.
@@ -153,3 +114,40 @@ transcribe.bat -single audio.mp3 -vtt
 When `-translate` and `-srt` are used together, the tool generates both:
 - original-language transcript/subtitle
 - English translation transcript/subtitle
+
+## Notes for Windows / Parallels
+
+If you run the Windows version inside Parallels or another VM, performance may be slower than native macOS.
+This release includes a compatibility workaround for common OpenMP runtime conflicts on Windows.
+
+## Log Wording
+
+The run summary shows:
+- **Source setting** = what you asked the program to do (`auto` means automatic detection)
+- **Target language** = only shown when translation is enabled
+
+## Accuracy Disclaimer
+
+Transcription and translation quality depend heavily on:
+- audio quality
+- speaker clarity
+- accent / dialect
+- background noise
+- speaking speed
+- recording compression
+- conversational vs. formal speech
+
+While this software has been extensively tested and refined, no automated transcription or translation system can guarantee perfect accuracy. Users are encouraged to review generated outputs before relying on them for important, professional, academic, legal, or medical purposes.
+
+## License
+
+MIT License
+
+## Author
+
+**Abbas SALAMAT**  
+Abbas.salamat@edu.donau-uni.ac.at
+Suggestions, improvements, bug reports, and contributions are welcome.
+
+
+
