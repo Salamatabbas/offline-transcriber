@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Audio Transcriber v1.2.0
+=======
+# Audio Transcriber v1.2.2
+>>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
 
 Offline multilingual audio transcription and optional translation pipeline.
 
@@ -91,6 +95,7 @@ transcribe.bat -preprocess
 - `--init` create project folders and config
 - `-config` show current config
 
+<<<<<<< HEAD
 ## Accuracy Disclaimer
 
 Transcription and translation quality depend heavily on:
@@ -131,6 +136,9 @@ The run summary shows:
 
 
 ## Installing Additional Models Later
+=======
+## Subtitle Export
+>>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
 
 If you initially installed only one model and later need another one, you can use the upgrade scripts while connected to the internet.
 
@@ -148,6 +156,7 @@ upgrade_models.bat -large
 upgrade_models.bat -medium -large
 ```
 
+<<<<<<< HEAD
 If a requested model is not installed locally, the transcriber will show a message telling you which upgrade command to run.
 
 
@@ -157,3 +166,46 @@ During normal transcription runs, the tool will **not** download missing models 
 If a requested model is not already installed locally, the program will stop and tell you to run the appropriate upgrade script while connected to the internet.
 
 This behavior is intentional and helps preserve the project's offline-first privacy model.
+=======
+When `-translate` and `-srt` are used together, the tool generates both:
+- original-language transcript/subtitle
+- English translation transcript/subtitle
+
+## Notes for Windows / Parallels
+
+If you run the Windows version inside Parallels or another VM, performance may be slower than native macOS.
+This release includes a compatibility workaround for common OpenMP runtime conflicts on Windows.
+
+## Log Wording
+
+The run summary shows:
+- **Source setting** = what you asked the program to do (`auto` means automatic detection)
+- **Target language** = only shown when translation is enabled
+
+## Accuracy Disclaimer
+
+Transcription and translation quality depend heavily on:
+- audio quality
+- speaker clarity
+- accent / dialect
+- background noise
+- speaking speed
+- recording compression
+- conversational vs. formal speech
+
+While this software has been extensively tested and refined, no automated transcription or translation system can guarantee perfect accuracy. Users are encouraged to review generated outputs before relying on them for important, professional, academic, legal, or medical purposes.
+
+## License
+
+MIT License
+
+## Author
+
+**Abbas SALAMAT**  
+Abbas.salamat@edu.donau-uni.ac.at
+
+Suggestions, improvements, bug reports, and contributions are welcome.
+
+
+
+>>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
