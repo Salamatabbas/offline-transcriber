@@ -48,12 +48,14 @@ Usage:
   python transcribe.py
   python transcribe.py -single lecture1.m4a
   python transcribe.py -translate
-  python transcribe.py -srt
-  python transcribe.py -vtt
   python transcribe.py -large
   python transcribe.py -accurate
   python transcribe.py -preprocess
   python transcribe.py -force
+
+Model upgrades:
+  upgrade_models_mac.sh -small|-medium|-large
+  upgrade_models.bat -small|-medium|-large
 """.strip()
 
 def project_paths():
@@ -589,7 +591,21 @@ def main():
     log_file = paths["logs"] / ("run_log_" + time.strftime("%Y%m%d_%H%M%S") + ".txt")
     summary_file = paths["logs"] / "last_run_summary.txt"
     stats = {"found": len(audio_files), "processed": 0, "skipped": 0, "errors": 0, "archived": 0}
-    model = WhisperModel(opts["model"], device=DEVICE, compute_type=COMPUTE_TYPE)
+    try:
+        model = WhisperModel(opts["model"], device=DEVICE, compute_type=COMPUTE_TYPE, local_files_only=True)
+    except Exception:
+        print()
+        print("ERROR: The requested model could not be loaded.")
+        print("This usually means the model is not installed locally yet.")
+        print("Automatic online model download during transcription is disabled by design.")
+        print()
+        print("Please connect to the internet and run one of these:")
+        print("  macOS   : ./upgrade_models_mac.sh -" + opts["model"])
+        print("  Windows : upgrade_models.bat -" + opts["model"])
+        print()
+        print("Or run the upgrade script without parameters to choose from the menu.")
+        print()
+        sys.exit(1)
     with open(log_file, "w", encoding="utf-8") as log:
         log.write("Run started: {}\n".format(time.ctime(start_time)))
         log.write(json.dumps(opts, ensure_ascii=False, indent=2) + "\n\n")

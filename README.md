@@ -1,22 +1,28 @@
-# Audio Transcriber v1.2.1
+# Audio Transcriber v1.2.0
 
 Offline multilingual audio transcription and optional translation pipeline.
 
+## Privacy & Data Handling
+
+All processing is performed fully offline on the user's local machine.
+
+This software does **not**:
+- upload audio files
+- transmit transcripts
+- send translations
+- share metadata
+- collect analytics
+- communicate with external servers during transcription or translation
+
+No user data is stored, shared, or transmitted beyond the user's own device.
+
+Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
 
 ## About This Project
 
+This project was developed using a **Vibe Coding** workflow with extensive human supervision, iterative refinement, and multi-phase testing.
 
-Offline Transcriber is an open-source tool for accurate offline transcription of audio recordings into text. It supports a wide range of common audio formats and can optionally translate transcripts into English. After the initial installation, all transcription runs fully offline without requiring an internet connection.
-
-The tool is especially useful for:
-
-* Students and academic researchers transcribing interviews
-* Journalists handling sensitive recordings
-* Professionals working with confidential audio data
-* Anyone who needs privacy-preserving offline speech-to-text transcription
-
-
-This project was developed using a **Vibe Coding** workflow with extensive human supervision, iterative refinement, and multi-phase testing. Every major component has been manually reviewed, repeatedly tested, and improved over multiple development phases.
+Every major component has been manually reviewed, repeatedly tested, and improved over multiple development phases.
 
 ## Features
 
@@ -31,12 +37,6 @@ This project was developed using a **Vibe Coding** workflow with extensive human
 - Detailed run logs with RTF metrics
 - Interactive installer with model selection
 - MIT License
-
-## Privacy & Data Handling
-
-All processing is performed fully offline on the user's local machine.
-No user data is stored, shared, or transmitted beyond the user's own device. Model downloads may occur only during installation or first-time setup if selected models are not already cached locally.
-
 
 ## Installation
 
@@ -54,8 +54,6 @@ install_transcriber.bat
 ```
 
 ## Usage Examples
-Before running the tool, place the audio files you want to transcribe into the **Input** folder located in the project directory. The transcriber will automatically process supported audio files found there.
-
 
 ### macOS
 ```bash
@@ -132,24 +130,30 @@ The run summary shows:
 - **Target language** = only shown when translation is enabled
 
 
-## Subtitle Export
+## Installing Additional Models Later
 
-The tool can export subtitle files in `.srt` and `.vtt` formats.
+If you initially installed only one model and later need another one, you can use the upgrade scripts while connected to the internet.
 
-### Examples
-
+### macOS
 ```bash
-./transcribe_mac.sh -single audio.mp3 -srt
-./transcribe_mac.sh -single audio.mp3 -translate -srt
-./transcribe_mac.sh -single audio.mp3 -vtt
+./upgrade_models_mac.sh
+./upgrade_models_mac.sh -large
+./upgrade_models_mac.sh -medium -large
 ```
 
+### Windows
 ```bat
-transcribe.bat -single audio.mp3 -srt
-transcribe.bat -single audio.mp3 -translate -srt
-transcribe.bat -single audio.mp3 -vtt
+upgrade_models.bat
+upgrade_models.bat -large
+upgrade_models.bat -medium -large
 ```
 
-When `-translate` and `-srt` are used together, the tool generates both:
-- original-language transcript/subtitle
-- English translation transcript/subtitle
+If a requested model is not installed locally, the transcriber will show a message telling you which upgrade command to run.
+
+
+## Offline-Safe Model Loading
+
+During normal transcription runs, the tool will **not** download missing models automatically.
+If a requested model is not already installed locally, the program will stop and tell you to run the appropriate upgrade script while connected to the internet.
+
+This behavior is intentional and helps preserve the project's offline-first privacy model.

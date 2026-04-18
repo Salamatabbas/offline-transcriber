@@ -1,9 +1,8 @@
-# Release Notes v1.2.2
+# Release Notes v1.2.5
 
-## Documentation / UX update
-- Clarified CLI help for `-srt` and `-vtt`
-- Added subtitle export section to README
+## Hotfix
+- Removed raw traceback when a requested model is missing
+- The program now exits cleanly after showing the upgrade guidance
 
-## Note
-SRT/VTT export was already supported by the validated transcription core.
-This release makes that capability visible and documented.
+## Result
+Missing-model behavior is now both offline-safe and user-friendly.
