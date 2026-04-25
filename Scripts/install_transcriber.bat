@@ -1,41 +1,53 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 set KMP_DUPLICATE_LIB_OK=TRUE
 set "SCRIPT_DIR=%~dp0"
 
+color 0B
 title Audio Transcriber Setup (Windows)
 
-echo ========================================
-echo Audio Transcriber Setup
-echo ========================================
 echo.
+echo ==================================================
+echo        Audio Transcriber Setup for Windows
+echo ==================================================
+echo.
+
+REM ============================
+REM Spinner Function
+REM ============================
+
+set spinner=|/-\
+
+:spin
+set /a idx=(idx+1) %% 4
+<nul set /p= !spinner:~%idx%,1!
+timeout /t 1 >nul
+<nul set /p=
+goto :eof
 
 REM ============================
 REM FFmpeg
 REM ============================
+
+echo [1/5] Checking FFmpeg...
 
 if exist "C:\ffmpeg\bin\ffmpeg.exe" set "PATH=C:\ffmpeg\bin;%PATH%"
 if exist "C:\ffmpeg\bin\ffprobe.exe" set "PATH=C:\ffmpeg\bin;%PATH%"
 
 where ffmpeg >nul 2>nul
 if errorlevel 1 (
-  echo FFmpeg not found. Installing...
+  echo Installing FFmpeg... Please wait.
 
   if not exist "C:\ffmpeg" mkdir "C:\ffmpeg"
   cd /d "C:\ffmpeg"
 
-  powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "Invoke-WebRequest 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'"
+  start "" /b cmd /c powershell -Command ^
+  "Invoke-WebRequest 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'" >nul 2>nul
 
-  if errorlevel 1 (
-    echo FFmpeg download failed.
-    pause
-    exit /b 1
-  )
+  for /l %%i in (1,1,8) do call :spin
 
-  powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "Expand-Archive 'ffmpeg.zip' -DestinationPath 'C:\ffmpeg' -Force"
+  powershell -Command "Expand-Archive 'ffmpeg.zip' -DestinationPath 'C:\ffmpeg' -Force" >nul 2>nul
 
   for /d %%i in ("C:\ffmpeg\ffmpeg-*") do (
     xcopy /E /I /Y "%%i\*" "C:\ffmpeg\" >nul
@@ -43,153 +55,94 @@ if errorlevel 1 (
   )
 
   del ffmpeg.zip >nul 2>nul
-
-  set "PATH=C:\ffmpeg\bin;%PATH%"
+  set PATH=C:\ffmpeg\bin;%PATH%
   setx PATH "%PATH%" >nul
 
+  echo.
   echo FFmpeg installed.
 ) else (
   echo FFmpeg already installed.
 )
 
-where ffprobe >nul 2>nul
-if errorlevel 1 (
-  echo FFprobe not found.
-  pause
-  exit /b 1
-)
-
 REM ============================
-REM Python check (REAL)
+REM Python
 REM ============================
 
 echo.
-echo Checking Python...
+echo [2/5] Checking Python...
 
 python --version >nul 2>nul
 if errorlevel 1 (
-  echo.
-  echo Python is not properly installed.
-  echo.
+  echo Python not found.
 
   choice /C YN /M "Install Python automatically?"
-  if errorlevel 2 (
-    echo Installation cancelled.
-    pause
-    exit /b 0
-  )
-
-  where winget >nul 2>nul
-  if errorlevel 1 (
-    echo winget not available.
-    echo Please install Python manually:
-    echo https://www.python.org/downloads/windows/
-    echo IMPORTANT: enable "Add Python to PATH"
-    pause
-    exit /b 1
-  )
+  if errorlevel 2 exit /b
 
   echo Installing Python...
 
-  winget install -e --id Python.Python.3.13 --source winget
-  if errorlevel 1 (
-    echo Trying Python 3.12...
-    winget install -e --id Python.Python.3.12 --source winget
-  )
+  start "" /b cmd /c winget install -e --id Python.Python.3.13 --source winget --accept-package-agreements --accept-source-agreements >nul 2>nul
 
-  if errorlevel 1 (
-    echo Python installation failed.
-    echo Install manually from:
-    echo https://www.python.org/downloads/windows/
-    pause
-    exit /b 1
-  )
+  for /l %%i in (1,1,10) do call :spin
 
   echo.
-  echo Python installed.
-  echo Close this window and run installer again.
+  echo Restart installer after Python install.
   pause
-  exit /b 0
+  exit /b
 )
 
 echo Python OK.
 
 REM ============================
-REM pip setup
+REM Dependencies
 REM ============================
 
 echo.
-echo Preparing pip...
+echo [3/5] Installing dependencies...
 
-python -m ensurepip --upgrade
-python -m pip install --upgrade pip
+start "" /b cmd /c python -m pip install faster-whisper tqdm huggingface_hub >nul 2>nul
 
-REM ============================
-REM dependencies
-REM ============================
+for /l %%i in (1,1,10) do call :spin
 
 echo.
-echo Installing dependencies...
-
-python -m pip install faster-whisper tqdm huggingface_hub
-
-if errorlevel 1 (
-  echo.
-  echo Dependency installation FAILED.
-  echo See error above.
-  pause
-  exit /b 1
-)
-
 echo Dependencies installed.
 
 REM ============================
-REM model selection
+REM Model
 REM ============================
 
 echo.
-echo Choose model:
-echo 1^) small
-echo 2^) medium
-echo 3^) large
-echo 4^) all
+echo [4/5] Select model:
+echo 1) small
+echo 2) medium
+echo 3) large
+echo 4) all
+
 set /p MODELCHOICE=Choice: 
 
-if "%MODELCHOICE%"=="1" (
-  python "%SCRIPT_DIR%preload_models.py" small
-) else if "%MODELCHOICE%"=="2" (
-  python "%SCRIPT_DIR%preload_models.py" medium
-) else if "%MODELCHOICE%"=="3" (
-  python "%SCRIPT_DIR%preload_models.py" large
-) else if "%MODELCHOICE%"=="4" (
-  python "%SCRIPT_DIR%preload_models.py" small medium large
-) else (
-  python "%SCRIPT_DIR%preload_models.py" medium
-)
+echo Downloading model... please wait.
 
-if errorlevel 1 (
-  echo Model download failed.
-  pause
-  exit /b 1
-)
+start "" /b cmd /c python "%SCRIPT_DIR%preload_models.py" >nul 2>nul
+
+for /l %%i in (1,1,15) do call :spin
+
+echo.
+echo Model ready.
 
 REM ============================
-REM init
+REM Init
 REM ============================
 
 echo.
-echo Initializing project...
-python "%SCRIPT_DIR%transcribe.py" --init
+echo [5/5] Finalizing setup...
 
-if errorlevel 1 (
-  echo Init failed.
-  pause
-  exit /b 1
-)
+start "" /b cmd /c python "%SCRIPT_DIR%transcribe.py" --init >nul 2>nul
 
+for /l %%i in (1,1,5) do call :spin
+
+color 0A
 echo.
 echo ========================================
-echo Installation SUCCESSFUL
+echo        Installation COMPLETE
 echo ========================================
 echo.
 
