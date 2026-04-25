@@ -28,6 +28,12 @@ if errorlevel 1 (
   powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "Invoke-WebRequest 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'"
 
+  if errorlevel 1 (
+    echo FFmpeg download failed.
+    pause
+    exit /b 1
+  )
+
   powershell -NoProfile -ExecutionPolicy Bypass -Command ^
     "Expand-Archive 'ffmpeg.zip' -DestinationPath 'C:\ffmpeg' -Force"
 
@@ -46,8 +52,15 @@ if errorlevel 1 (
   echo FFmpeg already installed.
 )
 
+where ffprobe >nul 2>nul
+if errorlevel 1 (
+  echo FFprobe not found.
+  pause
+  exit /b 1
+)
+
 REM ============================
-REM Python REAL check (FIX)
+REM Python check (REAL)
 REM ============================
 
 echo.
@@ -77,9 +90,23 @@ if errorlevel 1 (
   )
 
   echo Installing Python...
-  winget install -e --id Python.Python.3
+
+  winget install -e --id Python.Python.3.13 --source winget
+  if errorlevel 1 (
+    echo Trying Python 3.12...
+    winget install -e --id Python.Python.3.12 --source winget
+  )
+
+  if errorlevel 1 (
+    echo Python installation failed.
+    echo Install manually from:
+    echo https://www.python.org/downloads/windows/
+    pause
+    exit /b 1
+  )
 
   echo.
+  echo Python installed.
   echo Close this window and run installer again.
   pause
   exit /b 0
@@ -88,7 +115,7 @@ if errorlevel 1 (
 echo Python OK.
 
 REM ============================
-REM pip
+REM pip setup
 REM ============================
 
 echo.
@@ -109,7 +136,7 @@ python -m pip install faster-whisper tqdm huggingface_hub
 if errorlevel 1 (
   echo.
   echo Dependency installation FAILED.
-  echo Please check error above.
+  echo See error above.
   pause
   exit /b 1
 )
@@ -117,7 +144,7 @@ if errorlevel 1 (
 echo Dependencies installed.
 
 REM ============================
-REM models
+REM model selection
 REM ============================
 
 echo.
@@ -140,6 +167,12 @@ if "%MODELCHOICE%"=="1" (
   python "%SCRIPT_DIR%preload_models.py" medium
 )
 
+if errorlevel 1 (
+  echo Model download failed.
+  pause
+  exit /b 1
+)
+
 REM ============================
 REM init
 REM ============================
@@ -148,8 +181,16 @@ echo.
 echo Initializing project...
 python "%SCRIPT_DIR%transcribe.py" --init
 
+if errorlevel 1 (
+  echo Init failed.
+  pause
+  exit /b 1
+)
+
 echo.
 echo ========================================
 echo Installation SUCCESSFUL
 echo ========================================
+echo.
+
 pause
