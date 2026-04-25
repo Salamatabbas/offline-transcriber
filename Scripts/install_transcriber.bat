@@ -136,8 +136,19 @@ REM Python Dependencies
 REM ============================
 
 echo Installing Python dependencies...
-python -m pip install --upgrade pip >nul 2>nul
-python -m pip install --upgrade faster-whisper tqdm huggingface_hub >nul 2>nul
+
+python -m ensurepip --upgrade
+python -m pip install --upgrade pip
+python -m pip install --upgrade faster-whisper tqdm huggingface_hub
+
+if errorlevel 1 (
+  echo.
+  echo Python dependency installation failed.
+  echo Please read the error message above.
+  echo.
+  pause
+  exit /b 1
+)
 
 if errorlevel 1 (
   echo.
