@@ -5,144 +5,139 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 chmod +x "$SCRIPT_DIR"/*.sh 2>/dev/null
 
-echo "========================================"
-echo "Audio Transcriber Setup (macOS)"
-echo "========================================"
+echo
+echo "=================================================="
+echo "       Audio Transcriber Setup for macOS"
+echo "=================================================="
+echo
+echo "This installer will prepare:"
+echo "  - FFmpeg"
+echo "  - Python dependencies"
+echo "  - Transcription model files"
+echo
+echo "Please keep this window open until setup finishes."
 echo
 
-# ============================
-# Homebrew Check
-# ============================
+echo "[1/4] Checking Homebrew..."
 
 if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew was not found."
-  echo "Homebrew is required to install FFmpeg."
   echo
-
-  read "INSTALL_BREW?Do you want to install Homebrew now? [y/N]: "
-
-  if [[ "$INSTALL_BREW" == "y" || "$INSTALL_BREW" == "Y" ]]; then
-    echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  else
-    echo
-    echo "Installation cancelled."
-    echo "Thank you. Please install Homebrew later from:"
-    echo "https://brew.sh"
-    exit 0
-  fi
+  echo "ERROR: Homebrew was not found."
+  echo "Please install Homebrew first:"
+  echo
+  echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+  echo
+  exit 1
 fi
 
-# ============================
-# FFmpeg Check & Install
-# ============================
+echo "     Homebrew OK."
 
-echo "Checking FFmpeg..."
+echo
+echo "[2/4] Checking FFmpeg..."
 
 if ! command -v ffmpeg >/dev/null 2>&1; then
-  echo "FFmpeg not found. Installing FFmpeg with Homebrew..."
-  brew install ffmpeg
+  echo "     FFmpeg not found. Installing FFmpeg..."
+  brew install ffmpeg >/dev/null 2>&1
 
   if ! command -v ffmpeg >/dev/null 2>&1; then
     echo
-    echo "FFmpeg installation failed or ffmpeg is not available in PATH."
-    echo "Please check your Homebrew installation and run this installer again."
+    echo "ERROR: FFmpeg installation failed."
+    echo "Please check Homebrew and try again."
+    echo
     exit 1
   fi
 
-  echo "FFmpeg installed successfully."
+  echo "     FFmpeg installed successfully."
 else
-  echo "FFmpeg already installed."
+  echo "     FFmpeg already installed."
 fi
 
 if ! command -v ffprobe >/dev/null 2>&1; then
   echo
-  echo "FFprobe was not found."
+  echo "ERROR: FFprobe was not found."
   echo "FFprobe is normally installed together with FFmpeg."
   echo "Please run: brew install ffmpeg"
+  echo
   exit 1
 fi
 
-# ============================
-# Python Check & Optional Install
-# ============================
+echo
+echo "[3/4] Checking Python..."
 
 if ! command -v python3 >/dev/null 2>&1; then
-  echo
-  echo "Python 3 was not found."
-  echo "This program requires Python 3."
-  echo
+  echo "     Python3 not found. Installing Python..."
+  brew install python >/dev/null 2>&1
 
-  read "INSTALL_PYTHON?Do you want to install Python 3 with Homebrew now? [y/N]: "
-
-  if [[ "$INSTALL_PYTHON" == "y" || "$INSTALL_PYTHON" == "Y" ]]; then
-    echo "Installing Python 3..."
-    brew install python
-
-    if ! command -v python3 >/dev/null 2>&1; then
-      echo
-      echo "Python 3 was installed, but it is not available in this terminal yet."
-      echo "Please close this terminal, open a new one, and run this installer again."
-      exit 0
-    fi
-  else
+  if ! command -v python3 >/dev/null 2>&1; then
     echo
-    echo "Installation cancelled."
-    echo "Thank you. Please install Python 3 later, then run this installer again."
-    exit 0
+    echo "ERROR: Python installation failed."
+    echo "Please install Python manually and run this installer again."
+    echo
+    exit 1
   fi
 fi
 
-echo "Python 3 found."
+echo "     Python OK."
 
-# ============================
-# Python Dependencies
-# ============================
+echo
+echo "     Installing Python dependencies. Please wait..."
 
-echo "Installing Python dependencies..."
+python3 -m ensurepip --upgrade >/dev/null 2>&1 || true
 python3 -m pip install --upgrade pip >/dev/null 2>&1
 python3 -m pip install --upgrade faster-whisper tqdm huggingface_hub >/dev/null 2>&1
 
-# ============================
-# Model Selection
-# ============================
+echo "     Dependencies installed successfully."
 
 echo
-echo "Choose model download option:"
-echo "1) Fast      (small)"
-echo "2) Balanced  (medium)"
-echo "3) Accurate  (large)"
-echo "4) All Models (larger download)"
+echo "[4/4] Choose transcription model:"
+echo
+echo "  1) Fast      - small"
+echo "  2) Balanced  - medium"
+echo "  3) Accurate  - large"
+echo "  4) All Models"
+echo
 
 read "MODELCHOICE?Enter choice [1-4]: "
 
+echo
+echo "     Downloading selected model(s)."
+echo "     This may take several minutes. Please wait..."
+
 case "$MODELCHOICE" in
   1)
-    python3 "$SCRIPT_DIR/preload_models.py" small
+    python3 "$SCRIPT_DIR/preload_models.py" small >/dev/null 2>&1
     ;;
   2)
-    python3 "$SCRIPT_DIR/preload_models.py" medium
+    python3 "$SCRIPT_DIR/preload_models.py" medium >/dev/null 2>&1
     ;;
   3)
-    python3 "$SCRIPT_DIR/preload_models.py" large
+    python3 "$SCRIPT_DIR/preload_models.py" large >/dev/null 2>&1
     ;;
   4)
-    python3 "$SCRIPT_DIR/preload_models.py" small medium large
+    python3 "$SCRIPT_DIR/preload_models.py" small medium large >/dev/null 2>&1
     ;;
   *)
-    echo "Invalid choice. Using medium."
-    python3 "$SCRIPT_DIR/preload_models.py" medium
+    echo "     Invalid choice. Using medium model."
+    python3 "$SCRIPT_DIR/preload_models.py" medium >/dev/null 2>&1
     ;;
 esac
 
-# ============================
-# Initialize Project
-# ============================
+echo "     Model setup completed."
 
 echo
-echo "Initializing project folders..."
-python3 "$SCRIPT_DIR/transcribe.py" --init
+echo "     Initializing project folders..."
+
+python3 "$SCRIPT_DIR/transcribe.py" --init >/dev/null 2>&1
 
 echo
-echo "Installation finished successfully."
-echo "You can now run the transcriber."
+echo "=================================================="
+echo "       Installation completed"
+echo "       Setup is ready to use"
+echo "       Enjoy transcribing!"
+echo "=================================================="
+echo
+echo "You can now place audio files in the Input folder"
+echo "and run:"
+echo
+echo "  ./transcribe_mac.sh"
+echo
