@@ -1,30 +1,66 @@
 #!/bin/zsh
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-chmod +x "$SCRIPT_DIR"/*.sh 2>/dev/null
+
+set -e
 
 echo "========================================"
 echo "Audio Transcriber Setup (macOS)"
 echo "========================================"
 echo
 
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "Python 3 was not found."
-  echo "Please install Python 3 and run this installer again."
-  exit 1
-fi
+# ============================
+# Ensure Homebrew
+# ============================
 
 if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew was not found."
-  echo "Please install Homebrew from https://brew.sh and run this installer again."
+  echo "Homebrew not found."
+  echo "Please install Homebrew first:"
+  echo '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
   exit 1
 fi
 
-echo "Checking FFmpeg..."
-brew install ffmpeg >/dev/null 2>&1
+# ============================
+# FFmpeg Check & Install
+# ============================
 
-echo "Installing Python dependencies..."
+echo "Checking FFmpeg..."
+
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  echo "FFmpeg not found. Installing with Homebrew..."
+  brew install ffmpeg
+
+  if ! command -v ffmpeg >/dev/null 2>&1; then
+    echo "FFmpeg installation failed."
+    exit 1
+  fi
+
+  echo "FFmpeg installed successfully."
+else
+  echo "FFmpeg already installed."
+fi
+
+# ffprobe check (should come with ffmpeg)
+if ! command -v ffprobe >/dev/null 2>&1; then
+  echo "FFprobe not found. Reinstalling FFmpeg..."
+  brew reinstall ffmpeg
+fi
+
+# ============================
+# Python Check
+# ============================
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Python3 not found."
+  echo "Installing Python via Homebrew..."
+  brew install python
+fi
+
+echo "Upgrading pip and installing dependencies..."
 python3 -m pip install --upgrade pip >/dev/null 2>&1
 python3 -m pip install --upgrade faster-whisper tqdm huggingface_hub >/dev/null 2>&1
+
+# ============================
+# Model Selection
+# ============================
 
 echo
 echo "Choose model download option:"
@@ -32,20 +68,35 @@ echo "1) Fast      (small)"
 echo "2) Balanced  (medium)"
 echo "3) Accurate  (large)"
 echo "4) All Models (larger download)"
+
 read "MODELCHOICE?Enter choice [1-4]: "
 
-if [[ "$MODELCHOICE" == "1" ]]; then
-  python3 "$SCRIPT_DIR/preload_models.py" small
-elif [[ "$MODELCHOICE" == "2" ]]; then
-  python3 "$SCRIPT_DIR/preload_models.py" medium
-elif [[ "$MODELCHOICE" == "3" ]]; then
-  python3 "$SCRIPT_DIR/preload_models.py" large
-elif [[ "$MODELCHOICE" == "4" ]]; then
-  python3 "$SCRIPT_DIR/preload_models.py" small medium large
-else
-  echo "Invalid choice. Using medium."
-  python3 "$SCRIPT_DIR/preload_models.py" medium
-fi
+echo "This may take several minutes depending on model size."
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+case "$MODELCHOICE" in
+  1)
+    python3 "$SCRIPT_DIR/preload_models.py" small
+    ;;
+  2)
+    python3 "$SCRIPT_DIR/preload_models.py" medium
+    ;;
+  3)
+    python3 "$SCRIPT_DIR/preload_models.py" large
+    ;;
+  4)
+    python3 "$SCRIPT_DIR/preload_models.py" small medium large
+    ;;
+  *)
+    echo "Invalid choice. Using medium."
+    python3 "$SCRIPT_DIR/preload_models.py" medium
+    ;;
+esac
+
+# ============================
+# Initialize Project
+# ============================
 
 echo
 echo "Initializing project folders..."
@@ -53,3 +104,4 @@ python3 "$SCRIPT_DIR/transcribe.py" --init
 
 echo
 echo "Installation finished."
+echo "You can now run the transcriber."
