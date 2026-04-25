@@ -4,54 +4,38 @@ setlocal
 set KMP_DUPLICATE_LIB_OK=TRUE
 set "SCRIPT_DIR=%~dp0"
 
-REM Enable simple color theme
-color 0B
-
 title Audio Transcriber Setup (Windows)
 
-echo.
-echo ==================================================
-echo        Audio Transcriber Setup for Windows
-echo ==================================================
-echo.
-echo This installer will prepare:
-echo   - FFmpeg
-echo   - Python dependencies
-echo   - Transcription model files
-echo.
-echo Please keep this window open until setup finishes.
+echo ========================================
+echo Audio Transcriber Setup
+echo ========================================
 echo.
 
 REM ============================
 REM FFmpeg
 REM ============================
 
-echo [1/5] Checking FFmpeg...
-
 if exist "C:\ffmpeg\bin\ffmpeg.exe" set "PATH=C:\ffmpeg\bin;%PATH%"
 if exist "C:\ffmpeg\bin\ffprobe.exe" set "PATH=C:\ffmpeg\bin;%PATH%"
 
 where ffmpeg >nul 2>nul
 if errorlevel 1 (
-  echo      FFmpeg not found. Installing FFmpeg...
+  echo FFmpeg not found. Installing...
 
   if not exist "C:\ffmpeg" mkdir "C:\ffmpeg"
   cd /d "C:\ffmpeg"
 
   powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "Invoke-WebRequest 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'" >nul 2>nul
+    "Invoke-WebRequest 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'ffmpeg.zip'"
 
   if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: FFmpeg download failed.
-    echo Please check your internet connection and try again.
+    echo FFmpeg download failed.
     pause
     exit /b 1
   )
 
   powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "Expand-Archive 'ffmpeg.zip' -DestinationPath 'C:\ffmpeg' -Force" >nul 2>nul
+    "Expand-Archive 'ffmpeg.zip' -DestinationPath 'C:\ffmpeg' -Force"
 
   for /d %%i in ("C:\ffmpeg\ffmpeg-*") do (
     xcopy /E /I /Y "%%i\*" "C:\ffmpeg\" >nul
@@ -61,183 +45,152 @@ if errorlevel 1 (
   del ffmpeg.zip >nul 2>nul
 
   set "PATH=C:\ffmpeg\bin;%PATH%"
-  setx PATH "%PATH%" >nul 2>nul
+  setx PATH "%PATH%" >nul
 
-  echo      FFmpeg installed successfully.
+  echo FFmpeg installed.
 ) else (
-  echo      FFmpeg already installed.
+  echo FFmpeg already installed.
 )
 
 where ffprobe >nul 2>nul
 if errorlevel 1 (
-  color 0C
-  echo.
-  echo ERROR: FFprobe was not found.
-  echo Please check your FFmpeg installation.
+  echo FFprobe not found.
   pause
   exit /b 1
 )
 
 REM ============================
-REM Python
+REM Python check (REAL)
 REM ============================
 
 echo.
-echo [2/5] Checking Python...
+echo Checking Python...
 
 python --version >nul 2>nul
 if errorlevel 1 (
-  echo      Python is not properly installed.
+  echo.
+  echo Python is not properly installed.
   echo.
 
   choice /C YN /M "Install Python automatically?"
   if errorlevel 2 (
-    echo.
-    echo Setup cancelled.
-    echo You can install Python later from:
-    echo https://www.python.org/downloads/windows/
-    echo.
+    echo Installation cancelled.
     pause
     exit /b 0
   )
 
   where winget >nul 2>nul
   if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: winget is not available on this system.
+    echo winget not available.
     echo Please install Python manually:
     echo https://www.python.org/downloads/windows/
-    echo.
     echo IMPORTANT: enable "Add Python to PATH"
     pause
     exit /b 1
   )
 
-  echo      Installing Python. This may take a few minutes...
+  echo Installing Python...
 
-  winget install -e --id Python.Python.3.13 --source winget --accept-package-agreements --accept-source-agreements >nul 2>nul
+  winget install -e --id Python.Python.3.13 --source winget
   if errorlevel 1 (
-    echo      Python 3.13 was not available. Trying Python 3.12...
-    winget install -e --id Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements >nul 2>nul
+    echo Trying Python 3.12...
+    winget install -e --id Python.Python.3.12 --source winget
   )
 
   if errorlevel 1 (
-    color 0C
-    echo.
-    echo ERROR: Python installation failed.
-    echo Please install Python manually from:
+    echo Python installation failed.
+    echo Install manually from:
     echo https://www.python.org/downloads/windows/
     pause
     exit /b 1
   )
 
   echo.
-  echo Python was installed successfully.
-  echo Please close this window and run this installer again.
-  echo.
+  echo Python installed.
+  echo Close this window and run installer again.
   pause
   exit /b 0
 )
 
-echo      Python OK.
+echo Python OK.
 
 REM ============================
-REM pip / dependencies
+REM pip setup
 REM ============================
 
 echo.
-echo [3/5] Installing Python dependencies...
-echo      This may take a few minutes.
+echo Preparing pip...
 
-python -m ensurepip --upgrade >nul 2>nul
-python -m pip install --upgrade pip >nul 2>nul
-python -m pip install --upgrade faster-whisper tqdm huggingface_hub >nul 2>nul
+python -m ensurepip --upgrade
+python -m pip install --upgrade pip
+
+REM ============================
+REM dependencies
+REM ============================
+
+echo.
+echo Installing dependencies...
+
+python -m pip install faster-whisper tqdm huggingface_hub
 
 if errorlevel 1 (
-  color 0C
   echo.
-  echo ERROR: Python dependency installation failed.
-  echo Please check your internet connection and try again.
+  echo Dependency installation FAILED.
+  echo See error above.
   pause
   exit /b 1
 )
 
-echo      Dependencies installed successfully.
+echo Dependencies installed.
 
 REM ============================
-REM Model selection
+REM model selection
 REM ============================
 
 echo.
-echo [4/5] Choose transcription model:
-echo.
-echo   1^) Fast      - small
-echo   2^) Balanced  - medium
-echo   3^) Accurate  - large
-echo   4^) All Models
-echo.
-set /p MODELCHOICE=Enter choice [1-4]: 
-
-echo.
-echo      Downloading selected model(s).
-echo      This may take several minutes depending on model size.
-echo      Please wait...
+echo Choose model:
+echo 1^) small
+echo 2^) medium
+echo 3^) large
+echo 4^) all
+set /p MODELCHOICE=Choice: 
 
 if "%MODELCHOICE%"=="1" (
-  python "%SCRIPT_DIR%preload_models.py" small >nul 2>nul
+  python "%SCRIPT_DIR%preload_models.py" small
 ) else if "%MODELCHOICE%"=="2" (
-  python "%SCRIPT_DIR%preload_models.py" medium >nul 2>nul
+  python "%SCRIPT_DIR%preload_models.py" medium
 ) else if "%MODELCHOICE%"=="3" (
-  python "%SCRIPT_DIR%preload_models.py" large >nul 2>nul
+  python "%SCRIPT_DIR%preload_models.py" large
 ) else if "%MODELCHOICE%"=="4" (
-  python "%SCRIPT_DIR%preload_models.py" small medium large >nul 2>nul
+  python "%SCRIPT_DIR%preload_models.py" small medium large
 ) else (
-  echo      Invalid choice. Using medium model.
-  python "%SCRIPT_DIR%preload_models.py" medium >nul 2>nul
+  python "%SCRIPT_DIR%preload_models.py" medium
 )
 
 if errorlevel 1 (
-  color 0C
-  echo.
-  echo ERROR: Model download failed.
-  echo Please check your internet connection and run this installer again.
+  echo Model download failed.
   pause
   exit /b 1
 )
 
-echo      Model setup completed.
-
 REM ============================
-REM Init
+REM init
 REM ============================
 
 echo.
-echo [5/5] Initializing project folders...
-
-python "%SCRIPT_DIR%transcribe.py" --init >nul 2>nul
+echo Initializing project...
+python "%SCRIPT_DIR%transcribe.py" --init
 
 if errorlevel 1 (
-  color 0C
-  echo.
-  echo ERROR: Project initialization failed.
+  echo Init failed.
   pause
   exit /b 1
 )
 
-color 0A
 echo.
-echo ==================================================
-echo        Installation completed successfully!
-echo ==================================================
+echo ========================================
+echo Installation SUCCESSFUL
+echo ========================================
 echo.
-echo You can now place audio files in the Input folder
-echo and run:
-echo.
-echo   transcribe.bat
-echo.
-echo or for one file:
-echo.
-echo   transcribe.bat -single filename.mp3
-echo.
+
 pause
