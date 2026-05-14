@@ -6,6 +6,8 @@ import subprocess
 import shutil as _shutil
 from pathlib import Path
 from faster_whisper import WhisperModel
+from offline_transcriber.backend import pick_backend, wrap_transcriber
+from offline_transcriber.validation import validate_config, safe_input_file
 
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg", ".wma", ".mp4", ".m4b"}
 LANGUAGE_CODES = {"de", "en", "fr", "fa", "ar", "tr", "es", "it", "nl", "pt", "ru", "zh", "ja", "ko", "auto"}
@@ -34,11 +36,12 @@ DEFAULT_CONFIG = {
     "chunk_threshold_minutes": 20,
     "resume_chunks": True,
     "preprocess_audio": False,
-    "cleanup_work_files": True
+    "cleanup_work_files": True,
+    "device": "auto",
+    "compute_type": "auto",
+    "batch_size": 8
 }
 
-DEVICE = "cpu"
-COMPUTE_TYPE = "int8"
 
 def usage():
     return """
@@ -47,11 +50,16 @@ Usage:
   python transcribe.py -config
   python transcribe.py
   python transcribe.py -single lecture1.m4a
-  python transcribe.py -translate
+  python transcribe.py -translate          # transcript + English translation
+  python transcribe.py -translate-only     # English translation only, faster than both
+  python transcribe.py -srt
   python transcribe.py -large
   python transcribe.py -accurate
   python transcribe.py -preprocess
   python transcribe.py -force
+  python transcribe.py --self-test
+  python transcribe.py --validate
+  python transcribe.py --benchmark
 
 Model upgrades:
   upgrade_models_mac.sh -small|-medium|-large
@@ -108,6 +116,9 @@ def parse_args(argv, config):
     opts = dict(config)
     show_config = False
     init_only = False
+    self_test = False
+    validate_only = False
+    benchmark_only = False
 
     i = 0
     while i < len(argv):
@@ -137,6 +148,21 @@ def parse_args(argv, config):
         elif lower in {"-translate", "--translate"}:
             opts["mode"] = "both"
             opts["target_language"] = "en"
+        elif lower in {"-translate-only", "--translate-only", "-translation-only", "--translation-only"}:
+            opts["mode"] = "translate"
+            opts["target_language"] = "en"
+        elif lower in {"--self-test", "-self-test"}:
+            self_test = True
+        elif lower in {"--validate", "-validate"}:
+            validate_only = True
+        elif lower in {"--benchmark", "-benchmark"}:
+            benchmark_only = True
+        elif lower in {"-cpu", "--cpu"}:
+            opts["device"] = "cpu"
+            opts["compute_type"] = "int8"
+        elif lower in {"-cuda", "--cuda", "-gpu", "--gpu"}:
+            opts["device"] = "cuda"
+            opts["compute_type"] = "float16"
         elif lower == "--both":
             opts["mode"] = "both"
             opts["target_language"] = "en"
@@ -179,7 +205,7 @@ def parse_args(argv, config):
             print(usage())
             sys.exit(1)
         i += 1
-    return opts, show_config, init_only
+    return opts, show_config, init_only, self_test, validate_only, benchmark_only
 
 def run_cmd(cmd):
     completed = subprocess.run(cmd, capture_output=True, text=True)
@@ -229,7 +255,7 @@ def iter_audio_files(folder):
 def choose_files(input_dir, single_file):
     files = list(iter_audio_files(input_dir))
     if single_file:
-        target = input_dir / single_file
+        target = safe_input_file(input_dir, single_file)
         if not target.exists():
             raise FileNotFoundError("Single file not found in Input: {}".format(single_file))
         return [target]
@@ -351,7 +377,7 @@ def make_chunk_manifest(duration_seconds, chunk_minutes, overlap_seconds):
     return manifest
 
 def extract_chunk(src, chunk_file, start_seconds, duration_seconds):
-    run_cmd(["ffmpeg", "-y", "-ss", str(start_seconds), "-t", str(duration_seconds), "-i", str(src), "-vn", "-acodec", "pcm_s16le", str(chunk_file)])
+    run_cmd(["ffmpeg", "-y", "-ss", str(start_seconds), "-t", str(duration_seconds), "-i", str(src), "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(chunk_file)])
 
 def transcribe_chunk(model, chunk_file, source_language, clean, vad_filter, condition_on_previous_text, task):
     kwargs = {"task": task, "vad_filter": vad_filter, "condition_on_previous_text": condition_on_previous_text}
@@ -498,6 +524,8 @@ def process_file(model, audio_file, paths, opts, log):
             "requested_source_language": opts["source_language"],
             "model": opts["model"],
             "profile": opts["profile"],
+            "device": opts.get("device", "auto"),
+            "compute_type": opts.get("compute_type", "auto"),
             "duration_seconds": duration,
             "chunking_enabled": do_chunk,
             "chunk_count": total_chunks,
@@ -517,6 +545,8 @@ def process_file(model, audio_file, paths, opts, log):
             "target_language": "en",
             "model": opts["model"],
             "profile": opts["profile"],
+            "device": opts.get("device", "auto"),
+            "compute_type": opts.get("compute_type", "auto"),
             "duration_seconds": duration,
             "chunking_enabled": do_chunk,
             "chunk_count": total_chunks,
@@ -543,12 +573,29 @@ def main():
     paths = project_paths()
     ensure_dirs(paths)
     base_config = load_config(paths["config"])
-    opts, show_config, init_only = parse_args(sys.argv[1:], base_config)
+    opts, show_config, init_only, self_test, validate_only, benchmark_only = parse_args(sys.argv[1:], base_config)
     if init_only:
         init_project(paths)
         return
     if show_config:
         print(json.dumps(base_config, ensure_ascii=False, indent=2))
+        return
+    errors, validation_warnings = validate_config(opts)
+    if errors:
+        print("Config validation failed:")
+        for item in errors:
+            print(" -", item)
+        sys.exit(1)
+    if validation_warnings:
+        print("Config warnings:")
+        for item in validation_warnings:
+            print(" -", item)
+    if validate_only:
+        print("Config validation passed.")
+        return
+    if self_test:
+        from offline_transcriber.selftest import run_self_tests
+        run_self_tests(paths, {"srt_timestamp": srt_timestamp, "vtt_timestamp": vtt_timestamp, "build_output_paths": build_output_paths})
         return
     preflight_check(paths, opts)
     try:
@@ -585,14 +632,36 @@ def main():
     print("Resume chunks    :", opts["resume_chunks"])
     print("Preprocess audio :", opts["preprocess_audio"])
     print("Cleanup work     :", opts["cleanup_work_files"])
+    device, compute_type, backend_note = pick_backend(opts.get("device", "auto"), opts.get("compute_type", "auto"))
+    print("Backend          :", backend_note)
+    print("Device           :", device)
+    print("Compute type     :", compute_type)
+    print("Batch size       :", opts.get("batch_size", 8))
     print("Files found      :", len(audio_files))
     print("=" * 84)
+    if benchmark_only:
+        total_audio = 0.0
+        for audio_file in audio_files:
+            try:
+                total_audio += ffprobe_duration(audio_file)
+            except Exception:
+                pass
+        print("Benchmark plan:")
+        print(" - Audio files :", len(audio_files))
+        print(" - Audio sec   : {:.1f}".format(total_audio))
+        print(" - Model       :", opts["model"])
+        print(" - Backend     : {} / {}".format(device, compute_type))
+        print("Run without --benchmark to process files and get final RTF.")
+        return
     start_time = time.time()
     log_file = paths["logs"] / ("run_log_" + time.strftime("%Y%m%d_%H%M%S") + ".txt")
     summary_file = paths["logs"] / "last_run_summary.txt"
     stats = {"found": len(audio_files), "processed": 0, "skipped": 0, "errors": 0, "archived": 0}
     try:
-        model = WhisperModel(opts["model"], device=DEVICE, compute_type=COMPUTE_TYPE, local_files_only=True)
+        raw_model = WhisperModel(opts["model"], device=device, compute_type=compute_type, local_files_only=True)
+        model, batched = wrap_transcriber(raw_model, device, opts.get("batch_size", 8))
+        if batched:
+            print("Batched inference enabled for CUDA.")
     except Exception:
         print()
         print("ERROR: The requested model could not be loaded.")

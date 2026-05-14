@@ -1,8 +1,16 @@
-# Release Notes v1.2.5
+# Release Notes v1.3.5
 
-## Hotfix
-- Removed raw traceback when a requested model is missing
-- The program now exits cleanly after showing the upgrade guidance
+## Fixed
+- Final Windows launcher workflow
+- Windows installer now creates a reliable launcher inside the main project folder
+- Windows desktop shortcut points to the reliable local launcher
+- Tested on native Windows and Windows inside Parallels
 
-## Result
-Missing-model behavior is now both offline-safe and user-friendly.
+## Unchanged
+- macOS launcher remains unchanged because it is working correctly
+
+## Included
+- Clean ZIP structure
+- Desktop launcher icon assets
+- Installer model option: skip model download if models are already installed
+- Backend auto-detection, self-test, validation, benchmark support

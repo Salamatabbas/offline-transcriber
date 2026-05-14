@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-# Audio Transcriber v1.2.0
-=======
-# Audio Transcriber v1.2.2
->>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
+# Audio Transcriber v1.3.5
+
+# Audio Transcriber v1.3.5
 
 Offline multilingual audio transcription and optional translation pipeline.
 
@@ -41,6 +39,20 @@ Every major component has been manually reviewed, repeatedly tested, and improve
 - Detailed run logs with RTF metrics
 - Interactive installer with model selection
 - MIT License
+
+
+## Clean Release Structure
+
+The release ZIP intentionally includes only the project files needed to start:
+
+- `Scripts/`
+- `Assets/`
+- `README.md`
+- `LICENSE`
+- `RELEASE_NOTES.md`
+- `config.json`
+
+Runtime folders such as `Input`, `Done`, `Logs`, `Archive`, and `Work` are created automatically when the installer initializes the project.
 
 ## Installation
 
@@ -81,6 +93,17 @@ transcribe.bat -force
 transcribe.bat -preprocess
 ```
 
+
+
+## Desktop Launcher
+
+After installation, the installer creates a simple desktop launcher:
+
+- **Windows:** a reliable `Transcribe.bat` is created inside the main project folder, and a `Transcribe.lnk` desktop shortcut points to it.
+- **macOS:** `Transcribe.app` with the custom icon
+
+The launcher opens a terminal in the correct `Scripts` folder and shows the most common commands, so users do not need to manually navigate with `cd`.
+
 ## Parameters
 
 - `-translate` enable translation
@@ -95,7 +118,6 @@ transcribe.bat -preprocess
 - `--init` create project folders and config
 - `-config` show current config
 
-<<<<<<< HEAD
 ## Accuracy Disclaimer
 
 Transcription and translation quality depend heavily on:
@@ -135,10 +157,10 @@ The run summary shows:
 - **Target language** = only shown when translation is enabled
 
 
+
+During installation, you can choose **I already have the models - skip model download** if the required models are already cached locally.
+
 ## Installing Additional Models Later
-=======
-## Subtitle Export
->>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
 
 If you initially installed only one model and later need another one, you can use the upgrade scripts while connected to the internet.
 
@@ -156,7 +178,6 @@ upgrade_models.bat -large
 upgrade_models.bat -medium -large
 ```
 
-<<<<<<< HEAD
 If a requested model is not installed locally, the transcriber will show a message telling you which upgrade command to run.
 
 
@@ -166,46 +187,33 @@ During normal transcription runs, the tool will **not** download missing models 
 If a requested model is not already installed locally, the program will stop and tell you to run the appropriate upgrade script while connected to the internet.
 
 This behavior is intentional and helps preserve the project's offline-first privacy model.
-=======
-When `-translate` and `-srt` are used together, the tool generates both:
-- original-language transcript/subtitle
-- English translation transcript/subtitle
-
-## Notes for Windows / Parallels
-
-If you run the Windows version inside Parallels or another VM, performance may be slower than native macOS.
-This release includes a compatibility workaround for common OpenMP runtime conflicts on Windows.
-
-## Log Wording
-
-The run summary shows:
-- **Source setting** = what you asked the program to do (`auto` means automatic detection)
-- **Target language** = only shown when translation is enabled
-
-## Accuracy Disclaimer
-
-Transcription and translation quality depend heavily on:
-- audio quality
-- speaker clarity
-- accent / dialect
-- background noise
-- speaking speed
-- recording compression
-- conversational vs. formal speech
-
-While this software has been extensively tested and refined, no automated transcription or translation system can guarantee perfect accuracy. Users are encouraged to review generated outputs before relying on them for important, professional, academic, legal, or medical purposes.
-
-## License
-
-MIT License
-
-## Author
-
-**Abbas SALAMAT**  
-Abbas.salamat@edu.donau-uni.ac.at
-
-Suggestions, improvements, bug reports, and contributions are welcome.
 
 
+## Performance and Reliability Improvements
 
->>>>>>> d07c4895c7c41f47fa803a17908e73023b54641f
+Version 1.3.0 adds several internal improvements while keeping the tool simple to use:
+
+- Automatic backend selection: CUDA/GPU is used when available; otherwise CPU is used.
+- CUDA mode uses `float16` and batched inference when supported.
+- CPU mode stays conservative with `int8`.
+- `-translate-only` can be used when you only need an English translation and do not need the original transcript, avoiding the extra transcription pass.
+- `--validate` checks configuration without processing audio.
+- `--self-test` runs basic internal checks.
+- `--benchmark` reports the planned backend and audio duration without running full transcription.
+- Chunk extraction now uses mono 16 kHz WAV to reduce temporary file size and I/O.
+
+Examples:
+
+```bash
+./transcribe_mac.sh --validate
+./transcribe_mac.sh --self-test
+./transcribe_mac.sh --benchmark
+./transcribe_mac.sh -single interview.mp3 -translate-only
+```
+
+```bat
+transcribe.bat --validate
+transcribe.bat --self-test
+transcribe.bat --benchmark
+transcribe.bat -single interview.mp3 -translate-only
+```
