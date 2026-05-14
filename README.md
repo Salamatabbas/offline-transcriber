@@ -170,7 +170,7 @@ The launcher opens a terminal in the correct `Scripts` folder and shows the most
 If the desktop shortcut is not created automatically on Windows, you can still use the `Transcribe.bat` launcher located inside the main project folder.
 ## Performance and Reliability Improvements
 
-Version 1.3.0 adds several internal improvements while keeping the tool simple to use:
+Version 1.3.5 adds several internal improvements while keeping the tool simple to use:
 
 - Automatic backend selection: CUDA/GPU is used when available; otherwise CPU is used.
 - CUDA mode uses `float16` and batched inference when supported.
