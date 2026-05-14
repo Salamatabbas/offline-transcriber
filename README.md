@@ -167,6 +167,7 @@ After installation, the installer creates a simple desktop launcher:
 - **macOS:** `Transcribe.app` with the custom icon
 
 The launcher opens a terminal in the correct `Scripts` folder and shows the most common commands, so users do not need to manually navigate with `cd`.
+If the desktop shortcut is not created automatically on Windows, you can still use the `Transcribe.bat` launcher located inside the main project folder.
 ## Performance and Reliability Improvements
 
 Version 1.3.0 adds several internal improvements while keeping the tool simple to use:
