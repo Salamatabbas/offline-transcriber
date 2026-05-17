@@ -9,6 +9,9 @@ This tool is especially useful for:
 * Journalists handling sensitive recordings
 * Professionals working with confidential audio data
 * Anyone who needs privacy-preserving offline speech-to-text transcription
+  
+<img width="2856" height="1678" alt="Photo" src="https://github.com/user-attachments/assets/1c9b20af-af35-4ade-8c61-3ef4c8e09ef1" />
+
 
 ---
 
