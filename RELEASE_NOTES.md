@@ -1,16 +1,24 @@
-# Release Notes v1.3.5
+
+# Release Notes v1.3.6
+
+## New Features
+
+* **Full GUI implemented for Offline Transcriber** – users can now interact with the app via an intuitive interface instead of command-line.
+* Added **“Translate without transcription”** option with safe toggle logic.
+* Favorite Config can now be saved and loaded correctly.
+* Reset Default Config restores all settings to initial defaults.
+* Checkboxes visually indicate disabled state with dimmed text for clarity.
 
 ## Fixed
-- Final Windows launcher workflow
-- Windows installer now creates a reliable launcher inside the main project folder
-- Windows desktop shortcut points to the reliable local launcher
-- Tested on native Windows and Windows inside Parallels
 
-## Unchanged
-- macOS launcher remains unchanged because it is working correctly
+* Fixed missing `get_current_config` issue that caused crashes when saving favorite config.
+* Corrected f-string and syntax issues in logging Favorite Config path.
+* GUI logic corrected to prevent conflicting translation options from being active simultaneously.
 
-## Included
-- Clean ZIP structure
-- Desktop launcher icon assets
-- Installer model option: skip model download if models are already installed
-- Backend auto-detection, self-test, validation, benchmark support
+## Improvements
+
+* Color and style updates to better indicate active/inactive options.
+* Translation options now follow logical rules for SRT/VTT and translation checkboxes.
+* Code refactored for safer and more maintainable configuration management.
+
+

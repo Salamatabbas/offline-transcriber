@@ -87,7 +87,6 @@ python3 -m pip install --upgrade pip >/dev/null 2>&1
 python3 -m pip install --upgrade faster-whisper tqdm huggingface_hub >/dev/null 2>&1
 
 echo "     Dependencies installed successfully."
-<<<<<<< HEAD
 
 echo
 echo "[4/4] Choose transcription model:"
@@ -102,21 +101,6 @@ echo
 read "MODELCHOICE?Enter choice [1-5]: "
 
 echo
-=======
-
-echo
-echo "[4/4] Choose transcription model:"
-echo
-echo "  1) Fast      - small"
-echo "  2) Balanced  - medium"
-echo "  3) Accurate  - large"
-echo "  4) All Models"
-echo
-
-read "MODELCHOICE?Enter choice [1-4]: "
-
-echo
->>>>>>> cd71e1c2dded91ecd666e7375fbb0333ca2b7dff
 echo "     Downloading selected model(s)."
 echo "     This may take several minutes. Please wait..."
 
@@ -133,12 +117,9 @@ case "$MODELCHOICE" in
   4)
     python3 "$SCRIPT_DIR/preload_models.py" small medium large >/dev/null 2>&1
     ;;
-<<<<<<< HEAD
   5)
     echo "     Model download skipped."
     ;;
-=======
->>>>>>> cd71e1c2dded91ecd666e7375fbb0333ca2b7dff
   *)
     echo "     Invalid choice. Using medium model."
     python3 "$SCRIPT_DIR/preload_models.py" medium >/dev/null 2>&1
@@ -146,7 +127,6 @@ case "$MODELCHOICE" in
 esac
 
 echo "     Model setup completed."
-<<<<<<< HEAD
 
 echo
 echo "     Initializing project folders..."
@@ -209,13 +189,6 @@ EOF
 chmod +x "$APP_MACOS/Transcribe"
 
 echo "Desktop launcher created: Transcribe.app"
-=======
-
-echo
-echo "     Initializing project folders..."
-
-python3 "$SCRIPT_DIR/transcribe.py" --init >/dev/null 2>&1
->>>>>>> cd71e1c2dded91ecd666e7375fbb0333ca2b7dff
 
 echo
 echo "=================================================="
