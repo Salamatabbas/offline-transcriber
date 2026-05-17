@@ -1,7 +1,10 @@
 # Audio Transcriber v1.3.5
 
+<<<<<<< HEAD
 # Audio Transcriber v1.3.5
 
+=======
+>>>>>>> 2240b92693b2f995df746223d322f9fda7181621
 Offline multilingual audio transcription and optional translation pipeline.
 
 ## Privacy & Data Handling
@@ -39,20 +42,6 @@ Every major component has been manually reviewed, repeatedly tested, and improve
 - Detailed run logs with RTF metrics
 - Interactive installer with model selection
 - MIT License
-
-
-## Clean Release Structure
-
-The release ZIP intentionally includes only the project files needed to start:
-
-- `Scripts/`
-- `Assets/`
-- `README.md`
-- `LICENSE`
-- `RELEASE_NOTES.md`
-- `config.json`
-
-Runtime folders such as `Input`, `Done`, `Logs`, `Archive`, and `Work` are created automatically when the installer initializes the project.
 
 ## Installation
 
@@ -93,6 +82,7 @@ transcribe.bat -force
 transcribe.bat -preprocess
 ```
 
+<<<<<<< HEAD
 
 
 ## Desktop Launcher
@@ -103,6 +93,9 @@ After installation, the installer creates a simple desktop launcher:
 - **macOS:** `Transcribe.app` with the custom icon
 
 The launcher opens a terminal in the correct `Scripts` folder and shows the most common commands, so users do not need to manually navigate with `cd`.
+=======
+---
+>>>>>>> 2240b92693b2f995df746223d322f9fda7181621
 
 ## Parameters
 
@@ -118,7 +111,11 @@ The launcher opens a terminal in the correct `Scripts` folder and shows the most
 - `--init` create project folders and config
 - `-config` show current config
 
+<<<<<<< HEAD
 ## Accuracy Disclaimer
+=======
+---
+>>>>>>> 2240b92693b2f995df746223d322f9fda7181621
 
 Transcription and translation quality depend heavily on:
 - audio quality
@@ -157,9 +154,6 @@ The run summary shows:
 - **Target language** = only shown when translation is enabled
 
 
-
-During installation, you can choose **I already have the models - skip model download** if the required models are already cached locally.
-
 ## Installing Additional Models Later
 
 If you initially installed only one model and later need another one, you can use the upgrade scripts while connected to the internet.
@@ -178,6 +172,7 @@ upgrade_models.bat -large
 upgrade_models.bat -medium -large
 ```
 
+<<<<<<< HEAD
 If a requested model is not installed locally, the transcriber will show a message telling you which upgrade command to run.
 
 
@@ -187,11 +182,23 @@ During normal transcription runs, the tool will **not** download missing models 
 If a requested model is not already installed locally, the program will stop and tell you to run the appropriate upgrade script while connected to the internet.
 
 This behavior is intentional and helps preserve the project's offline-first privacy model.
+=======
+If a required model is missing, the program will show a clear instruction.
 
+---
+## Desktop Launcher
 
+After installation, the installer creates a simple desktop launcher:
+>>>>>>> 2240b92693b2f995df746223d322f9fda7181621
+
+- **Windows:** a reliable `Transcribe.bat` is created inside the main project folder, and a `Transcribe.lnk` desktop shortcut points to it.
+- **macOS:** `Transcribe.app` with the custom icon
+
+The launcher opens a terminal in the correct `Scripts` folder and shows the most common commands, so users do not need to manually navigate with `cd`.
+If the desktop shortcut is not created automatically on Windows, you can still use the `Transcribe.bat` launcher located inside the main project folder.
 ## Performance and Reliability Improvements
 
-Version 1.3.0 adds several internal improvements while keeping the tool simple to use:
+Version 1.3.5 adds several internal improvements while keeping the tool simple to use:
 
 - Automatic backend selection: CUDA/GPU is used when available; otherwise CPU is used.
 - CUDA mode uses `float16` and batched inference when supported.
@@ -217,3 +224,57 @@ transcribe.bat --self-test
 transcribe.bat --benchmark
 transcribe.bat -single interview.mp3 -translate-only
 ```
+<<<<<<< HEAD
+=======
+
+## Offline-Safe Model Loading
+
+During transcription, the tool will **not download models automatically**.
+
+If a model is not available locally, the program stops and instructs you to run the upgrade script.
+
+This ensures:
+
+* predictable behavior
+* full offline operation
+* maximum data privacy
+
+---
+
+## Notes for Windows / Parallels
+
+Running inside virtual environments (e.g. Parallels) may reduce performance.
+
+This release includes workarounds for common OpenMP runtime conflicts.
+
+---
+
+## Accuracy Disclaimer
+
+Transcription and translation quality depend on:
+
+* audio quality
+* speaker clarity
+* accent / dialect
+* background noise
+* speaking speed
+
+No automated system guarantees perfect accuracy.
+Users should review outputs before using them in critical contexts.
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Author
+
+**Abbas SALAMAT**
+
+[Abbas.salamat@edu.donau-uni.ac.at](mailto:Abbas.salamat@edu.donau-uni.ac.at)
+
+Suggestions, improvements, bug reports, and contributions are welcome.
+>>>>>>> 2240b92693b2f995df746223d322f9fda7181621
