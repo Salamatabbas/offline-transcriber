@@ -57,8 +57,10 @@ Double click the `Transcribe_GUI.command` on your Desktop to open the Transcribe
 ### Windows
 
 ```bat
+Install__GUI.bat
 Transcribe_GUI.bat
 ```
+Double click the `Transcribe` on your Desktop to open the Transcriber GUI.
 
 ---
 
