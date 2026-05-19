@@ -1,10 +1,10 @@
 @echo off
 setlocal
 
-:: مسیر اسکریپت
+
 set "SCRIPT_DIR=%~dp0"
 
-:: حل مشکل OpenMP
+
 set KMP_DUPLICATE_LIB_OK=TRUE
 
 color 0B
@@ -91,6 +91,7 @@ echo [3/5] Installing Python dependencies...
 python -m ensurepip --upgrade >nul 2>nul
 python -m pip install --upgrade pip >nul 2>nul
 python -m pip install --upgrade faster-whisper tqdm huggingface_hub >nul 2>nul
+python -m pip install --upgrade PyQt5 >nul 2>nul
 echo Dependencies installed successfully.
 
 :: ============================
@@ -137,7 +138,7 @@ $s.TargetPath=$target; ^
 $s.WorkingDirectory='%PROJECT_DIR%'; ^
 $ico='%ICON_PATH%'; ^
 if (Test-Path $ico) { $s.IconLocation=$ico }; ^
-$s.Save();" >nul 2>nul
+$s.Save();"
 
 echo GUI launcher created:
 echo   %LOCAL_LAUNCHER%
