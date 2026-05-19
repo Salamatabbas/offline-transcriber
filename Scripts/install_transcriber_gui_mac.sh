@@ -41,6 +41,7 @@ echo
 echo "Installing Python dependencies..."
 python3 -m pip install --upgrade pip
 python3 -m pip install --user faster-whisper tqdm huggingface_hub PyQt5
+python3 -m pip install --user PyQt5
 
 # --- Download all models automatically ---
 echo
